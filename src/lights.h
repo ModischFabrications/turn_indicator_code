@@ -50,6 +50,16 @@ namespace Lights
     }
   }
 
+  void togglePin(uint8_t pin)
+  {
+    uint32_t now = millis();
+    if (now - last_toggle > toggle_delay)
+    {
+      last_toggle = now;
+      digitalWrite(pin, !digitalRead(pin));
+    }
+  }
+
   void turn_off()
   {
     Serial.println(F("turning off"));
@@ -60,17 +70,12 @@ namespace Lights
   {
     Serial.println(F("turning left"));
     clear();
-    digitalWrite(Pins::BT_LEFT_IND, true);
+    // digitalWrite(Pins::BT_LEFT_IND, true);
   }
 
   void anim_left()
   {
-    uint32_t now = millis();
-    if (now - last_toggle > toggle_delay)
-    {
-      last_toggle = now;
-      digitalWrite(Pins::BT_LEFT_IND, !digitalRead(Pins::BT_LEFT_IND));
-    }
+    togglePin(Pins::BT_LEFT_IND);
 
     // TODO: wipe
   }
@@ -79,11 +84,13 @@ namespace Lights
   {
     Serial.println(F("turning right"));
     clear();
-    digitalWrite(Pins::BT_RIGHT_IND, true);
+    // digitalWrite(Pins::BT_RIGHT_IND, true);
   }
 
   void anim_right()
   {
+    togglePin(Pins::BT_RIGHT_IND);
+
     // TODO: wipe
   }
 

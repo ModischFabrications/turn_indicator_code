@@ -52,11 +52,11 @@ namespace Pins
         digitalWrite(BT_LEFT_IND, false);
         digitalWrite(BT_OFF_IND, true);
         digitalWrite(BT_RIGHT_IND, false);
-        delay(100);
+        delay(200);
         digitalWrite(BT_LEFT_IND, true);
         digitalWrite(BT_OFF_IND, false);
         digitalWrite(BT_RIGHT_IND, true);
-        delay(100);
+        delay(200);
         digitalWrite(BT_LEFT_IND, false);
         digitalWrite(BT_OFF_IND, false);
         digitalWrite(BT_RIGHT_IND, false);
