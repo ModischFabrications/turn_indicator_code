@@ -4,62 +4,87 @@
 #define FASTLED_INTERNAL // disable pragma message
 #include <FastLED.h>
 
-const uint8_t PIN_LEDS = 1;
-const uint8_t PIN_CLOCK_LEDS = 2;
+#include "pins.h"
 
-const uint32_t CURRENT_LIMIT__MA = 1000;
-
-const uint8_t N_LED_PER_SIDE = 10;
-// + sacrificial indicator and voltage stabilizer led on board
-const uint8_t N_LEDS = N_LED_PER_SIDE * 2 + 1;
-
-const CRGB INDICATOR_COLOR = CRGB::LightGoldenrodYellow;
-
-CRGB leds[N_LEDS];
-
-void startup()
+namespace Lights
 {
-  pinMode(PIN_LEDS, OUTPUT);
-  FastLED.addLeds<SK9822, PIN_LEDS, PIN_CLOCK_LEDS>(leds, N_LEDS);
 
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, CURRENT_LIMIT__MA);
-  FastLED.setBrightness(200);
+  const uint32_t CURRENT_LIMIT__MA = 1000;
 
-  FastLED.showColor(CRGB::Black);
-}
+  const uint8_t N_LED_PER_SIDE = 10;
+  // + sacrificial indicator and voltage stabilizer led on board
+  const uint8_t N_LEDS = N_LED_PER_SIDE * 2 + 1;
 
-void hello_world()
-{
-}
+  const CRGB INDICATOR_COLOR = CRGB::LightGoldenrodYellow;
 
-void sleep(uint32_t time_ms)
-{
-  FastLED.delay(time_ms);
-}
+  CRGB leds[N_LEDS];
 
-void turn_off()
-{
-  FastLED.showColor(CRGB::Black);
-}
+  uint32_t last_toggle = 0;
+  const uint16_t toggle_delay = 100;
 
-void turn_left()
-{
-  Serial.println(F("turning left"));
-  turn_off();
-}
+  void startup()
+  {
+    FastLED.addLeds<SK9822, Pins::DATA_LEDS, Pins::CLOCK_LEDS>(leds, N_LEDS);
 
-void anim_left()
-{
-  // TODO: wipe
-}
+    FastLED.setMaxPowerInVoltsAndMilliamps(5, CURRENT_LIMIT__MA);
+    FastLED.setBrightness(200);
 
-void turn_right()
-{
-  Serial.println(F("turning right"));
-  turn_off();
-}
+    FastLED.showColor(CRGB::Black);
+  }
 
-void anim_right()
-{
-  // TODO: wipe
-}
+  void hello_world()
+  {
+  }
+
+  void sleep(uint32_t time_ms)
+  {
+    FastLED.delay(time_ms);
+  }
+
+  void clear()
+  {
+    FastLED.showColor(CRGB::Black);
+    for (uint8_t i_i : Pins::INDICATORS)
+    {
+      digitalWrite(i_i, false);
+    }
+  }
+
+  void turn_off()
+  {
+    Serial.println(F("turning off"));
+    clear();
+  }
+
+  void turn_left()
+  {
+    Serial.println(F("turning left"));
+    clear();
+    digitalWrite(Pins::BT_LEFT_IND, true);
+  }
+
+  void anim_left()
+  {
+    uint32_t now = millis();
+    if (now - last_toggle > toggle_delay)
+    {
+      last_toggle = now;
+      digitalWrite(Pins::BT_LEFT_IND, !digitalRead(Pins::BT_LEFT_IND));
+    }
+
+    // TODO: wipe
+  }
+
+  void turn_right()
+  {
+    Serial.println(F("turning right"));
+    clear();
+    digitalWrite(Pins::BT_RIGHT_IND, true);
+  }
+
+  void anim_right()
+  {
+    // TODO: wipe
+  }
+
+} // namespace Lights

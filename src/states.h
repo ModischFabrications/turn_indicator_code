@@ -4,20 +4,20 @@
 #include <Fsm.h>
 
 #include "lights.h"
-#include "buttons.h"
+#include "pins.h"
 
 // pin numbers are unique by design
 // *10 for long press
-const uint8_t EV_OFF = PIN_BT_OFF;
-const uint8_t EV_LEFT = PIN_BT_LEFT;
-const uint8_t EV_RIGHT = PIN_BT_RIGHT;
+const uint8_t EV_OFF = Pins::BT_OFF;
+const uint8_t EV_LEFT = Pins::BT_LEFT;
+const uint8_t EV_RIGHT = Pins::BT_RIGHT;
 
-namespace StateManager
+namespace States
 {
     // https://github.com/jonblack/arduino-fsm/blob/master/examples/timed_switchoff/timed_switchoff.ino
-    State off_state(turn_off, NULL, NULL);
-    State left_state(turn_left, anim_left, NULL);
-    State right_state(turn_right, anim_right, NULL);
+    State off_state(Lights::turn_off, NULL, NULL);
+    State left_state(Lights::turn_left, Lights::anim_left, NULL);
+    State right_state(Lights::turn_right, Lights::anim_right, NULL);
 
     Fsm fsm(&off_state);
 

@@ -2,12 +2,21 @@
 
 #include "lights.h"
 #include "states.h"
-#include "buttons.h"
+#include "pins.h"
 
 const uint16_t targetLoopDuration = 10;
 const uint16_t TIMED_STATE_DURATION_MS = 10 * 1000;
 
 /**
+ * -- TODO
+ * power off? 
+ * - disconnect battery (possible?) 
+ * - disconnect after board: easy, check standby usage
+ * - deep sleep chip and LED off
+ * - deep sleep chip and LED disconnect via MOSFET
+ * 
+ * 
+ * -- usage
  * [LEFT] [OFF] [RIGHT]
  * (short press direction for 10s timer -> indicator blinks)
  * long press for continuous -> indicator on
@@ -24,30 +33,34 @@ const uint16_t TIMED_STATE_DURATION_MS = 10 * 1000;
 
 void check_buttons()
 {
-  for (uint8_t i_b : BUTTONS)
+  for (uint8_t i_b : Pins::BUTTONS)
   {
     bool state = digitalRead(i_b);
     // pullup
     if (!state)
-      StateManager::fsm.trigger(i_b);
+      States::fsm.trigger(i_b);
   }
 }
 
 void setup()
 {
-  for (uint8_t i_b : BUTTONS)
-  {
-    pinMode(i_b, INPUT_PULLUP);
-  }
+  Serial.begin(115200);
+  Serial.println(F("Starting..."));
 
-  startup();
-  hello_world();
+  Pins::setup();
+  Pins::wipe();
+
+  Lights::startup();
+  Lights::hello_world();
+
+  States::setup();
 }
 
 void loop()
 {
-  StateManager::fsm.run_machine();
+  check_buttons();
+  States::fsm.run_machine();
 
   // keep constant loop duration by aligning to target duration
-  sleep(targetLoopDuration - (millis() % targetLoopDuration));
+  Lights::sleep(targetLoopDuration - (millis() % targetLoopDuration));
 }
