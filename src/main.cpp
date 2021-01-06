@@ -3,11 +3,9 @@
 #include "lights.h"
 #include "states.h"
 #include "pins.h"
+#include "power.h"
 
-const uint16_t targetLoopDuration = 10;
-const uint16_t TIMED_STATE_DURATION_MS = 10 * 1000;
-
-bool power_low = false;
+const uint16_t TARGET_LOOP_DURATION = 10;
 
 /**
  * -- TODO
@@ -36,7 +34,7 @@ bool power_low = false;
 void check_buttons()
 {
   // TODO: long press detection
-  // -> save first_positive_flank_time, compare with
+  // -> save first_positive_flank_time, compare with now for hold time
 
   for (uint8_t i_b : Pins::BUTTONS)
   {
@@ -47,48 +45,29 @@ void check_buttons()
   }
 }
 
-void check_power()
-{
-  uint16_t bat_charge = analogRead(Pins::BAT_CHARGE);
-  if (!power_low && bat_charge < 500)
-  {
-    Serial.print("Power low with a measurement of ");
-    Serial.println(bat_charge);
-    // TODO: blink PWR_IND
-    power_low = true;
-  }
-  else if (power_low && bat_charge > 800)
-  {
-    Serial.print("Power restored with a measurement of ");
-    Serial.println(bat_charge);
-    // TODO: turn on PWR_IND
-    power_low = false;
-  }
-}
-
 void setup()
 {
-  digitalWrite(Pins::PWR_IND, false);
   Serial.begin(115200);
   Serial.println(F("Starting..."));
 
   Pins::setup();
-  Pins::wipe();
+  Pins::test_indicators();
 
   Lights::startup();
   Lights::hello_world();
 
   States::setup();
 
-  digitalWrite(Pins::PWR_IND, true);
+  Power::setup();
 }
 
 void loop()
 {
   check_buttons();
-  check_power();
+  Power::check_power();
+
   States::fsm.run_machine(); // timed transitions and on_state calls
 
   // keep constant loop duration by aligning to target duration
-  Lights::sleep(targetLoopDuration - (millis() % targetLoopDuration));
+  Lights::sleep(TARGET_LOOP_DURATION - (millis() % TARGET_LOOP_DURATION));
 }

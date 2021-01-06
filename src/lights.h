@@ -6,6 +6,14 @@
 
 #include "pins.h"
 
+/**
+ * https://www.reddit.com/r/FastLED/comments/gpsc89/custom_animations/
+ * https://github.com/atuline/FastLED-Demos
+ * https://www.reddit.com/r/FastLED/wiki/index/user_examples
+ * https://learn.adafruit.com/dotstar-belly-dance-fans/the-code
+ * 
+ * */
+
 namespace Lights
 {
 
@@ -19,8 +27,8 @@ namespace Lights
 
   CRGB leds[N_LEDS];
 
+  const uint16_t TURNING_TOGGLE_DELAY_MS = 500;
   uint32_t last_toggle = 0;
-  const uint16_t toggle_delay = 100;
 
   void startup()
   {
@@ -53,7 +61,7 @@ namespace Lights
   void togglePin(uint8_t pin)
   {
     uint32_t now = millis();
-    if (now - last_toggle > toggle_delay)
+    if (now - last_toggle > TURNING_TOGGLE_DELAY_MS)
     {
       last_toggle = now;
       digitalWrite(pin, !digitalRead(pin));

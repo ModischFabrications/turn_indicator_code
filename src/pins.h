@@ -47,8 +47,10 @@ namespace Pins
         // analog does not need a pinMode
     }
 
-    void wipe()
+    void test_indicators()
     {
+        digitalWrite(PWR_IND, false);
+
         digitalWrite(BT_LEFT_IND, false);
         digitalWrite(BT_OFF_IND, true);
         digitalWrite(BT_RIGHT_IND, false);
@@ -60,6 +62,8 @@ namespace Pins
         digitalWrite(BT_LEFT_IND, false);
         digitalWrite(BT_OFF_IND, false);
         digitalWrite(BT_RIGHT_IND, false);
+        
+        digitalWrite(PWR_IND, true);
     }
 
-} // namespace PINS
+} // namespace Pins
