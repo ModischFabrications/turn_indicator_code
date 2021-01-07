@@ -15,6 +15,10 @@ const uint16_t TARGET_LOOP_DURATION = 10;
  * - deep sleep chip and LED off
  * - deep sleep chip and LED disconnect via MOSFET
  * 
+ * APA idle: ~1mA per LED
+ * LEDs: ~3mA per (3mm) LED on
+ * Nano board: ~30mA when on and working
+ * - ~ ? mA when sleeping
  * 
  * -- usage
  * [LEFT] [OFF] [RIGHT]
@@ -47,13 +51,16 @@ void check_buttons()
 
 void setup()
 {
+  // init first to deactivate unwanted output currents
+  Pins::setup();
+  Pins::clear_output();
+
   Serial.begin(115200);
   Serial.println(F("Starting..."));
 
-  Pins::setup();
   Pins::test_indicators();
 
-  Lights::startup();
+  Lights::setup();
   Lights::hello_world();
 
   States::setup();

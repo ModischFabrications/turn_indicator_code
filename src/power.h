@@ -52,4 +52,6 @@ namespace Power
             blink();
     }
 
+    // hibernate? turn off LEDs with MOSFET?
+
 } // namespace Power
