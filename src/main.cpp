@@ -4,36 +4,9 @@
 #include "states.h"
 #include "pins.h"
 #include "power.h"
+#include "sleep.h"
 
 const uint16_t TARGET_LOOP_DURATION = 10;
-
-/**
- * -- TODO
- * power off? 
- * - disconnect battery (possible?) 
- * - disconnect after board: easy, check standby usage
- * - deep sleep chip and LED off
- * - deep sleep chip and LED disconnect via MOSFET
- * 
- * APA idle: ~1mA per LED
- * LEDs: ~3mA per (3mm) LED on
- * Nano board: ~30mA when on and working
- * - ~ ? mA when sleeping
- * 
- * -- usage
- * [LEFT] [OFF] [RIGHT]
- * (short press direction for 10s timer -> indicator blinks)
- * long press for continuous -> indicator on
- * 
- * short press OFF to turn off
- * (long press OFF to turn on stand lights (always on red dot) -> indicator on)
- * 
- * idempotent inputs instead of toggles, resists bouncing and is easier to understand
- * 
- * -- philosophy
- * "A Class with one instance is like a group with one person. Use a namespace instead"
- * classes won't allow pointers and make anonymous function usage difficult
- * */
 
 void check_buttons()
 {
