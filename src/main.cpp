@@ -6,7 +6,7 @@
 #include "power.h"
 #include "sleep.h"
 
-const uint16_t TARGET_LOOP_DURATION = 10;
+const uint16_t TARGET_LOOP_DURATION__MS = 10;
 
 void check_buttons()
 {
@@ -49,5 +49,5 @@ void loop()
   States::fsm.run_machine(); // timed transitions and on_state calls
 
   // keep constant loop duration by aligning to target duration
-  Lights::sleep(TARGET_LOOP_DURATION - (millis() % TARGET_LOOP_DURATION));
+  Lights::sleep(TARGET_LOOP_DURATION__MS - (millis() % TARGET_LOOP_DURATION__MS));
 }
