@@ -6,8 +6,8 @@
 
 namespace Power
 {
-    const uint16_t LOW_PWR_THRESHOLD = 790;  // ~3.8V
-    const uint16_t HIGH_PWR_THRESHOLD = 850; // ~4.1V
+    const float BAT_EMPTY = 3.8;
+    const float BAT_FULL = 4.0;
 
     bool power_low = false;
 
@@ -17,7 +17,7 @@ namespace Power
     void setup()
     {
         Serial.print(F("Initial power reading is "));
-        Serial.println(analogRead(Pins::BAT_CHARGE));
+        Serial.println(analogRead(Pins::BAT_V));
         digitalWrite(Pins::PWR_IND, true);
     }
 
@@ -31,19 +31,25 @@ namespace Power
         }
     }
 
+    float toVolt(uint16_t reading)
+    {
+        return (5.0/1024)*reading;
+    }
+
     void check_power()
     {
-        uint16_t bat_charge = analogRead(Pins::BAT_CHARGE);
-        if (!power_low && bat_charge < 500)
+        float bat_voltage = toVolt(analogRead(Pins::BAT_V));
+        //Serial.println(bat_voltage);
+        if (!power_low && bat_voltage < BAT_EMPTY)
         {
             Serial.print("Power low with a measurement of ");
-            Serial.println(bat_charge);
+            Serial.println(bat_voltage);
             power_low = true;
         }
-        else if (power_low && bat_charge > 800)
+        else if (power_low && bat_voltage > BAT_FULL)
         {
             Serial.print("Power restored with a measurement of ");
-            Serial.println(bat_charge);
+            Serial.println(bat_voltage);
             power_low = false;
             digitalWrite(Pins::PWR_IND, true);
         }

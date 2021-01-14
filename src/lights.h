@@ -18,7 +18,7 @@
 
 namespace Lights
 {
-  const uint8_t BRIGHTNESS = 100;
+  const uint8_t BRIGHTNESS = 127;
   const uint32_t CURRENT_LIMIT__MA = 500;
 
   // TODO: use multiple strips?
@@ -28,7 +28,7 @@ namespace Lights
   const uint8_t N_ALL_LEDS = N_LEDS_PER_SIDE * 2;
 
   const CRGB INDICATOR_COLOR = CRGB::Orange;
-  const float INDICATOR_S_PER_CYCLE = 0.5;
+  const float INDICATOR_S_PER_CYCLE = 1;
   float indicator_pos = 0;
   uint32_t last_frame__ms = millis();
 
@@ -104,25 +104,17 @@ namespace Lights
     float frametime_s = (now - last_frame__ms * 1.0) / 1000;
     last_frame__ms = now;
 
+    //fadeToBlackBy(left_leds, N_LEDS_PER_SIDE, (frametime_s/INDICATOR_S_PER_CYCLE)*255);   // half length
+    fadeToBlackBy(left_leds, N_LEDS_PER_SIDE, 20);
+
     indicator_pos += ((frametime_s * (float)N_LEDS_PER_SIDE) / INDICATOR_S_PER_CYCLE);
-    while (indicator_pos >= N_LEDS_PER_SIDE)
-      indicator_pos -= N_LEDS_PER_SIDE;
+    while (indicator_pos >= N_LEDS_PER_SIDE-1)
+      indicator_pos -= (N_LEDS_PER_SIDE);
 
     uint8_t upper_neighbor = (uint8_t)ceil(indicator_pos);
     uint8_t upper_scale = (upper_neighbor - indicator_pos) * 255;
-    uint8_t lower_neighbor = (uint8_t)floor(indicator_pos);
-    uint8_t lower_scale = (indicator_pos - lower_neighbor) * 255;
-
-    // wrap around one later to keep soft trail at upper border
-    if (upper_neighbor >= N_LEDS_PER_SIDE)
-      upper_neighbor = 0;
-
-    FastLED.clear(false);
-    //fadeToBlackBy(left_leds, N_LEDS_PER_SIDE, (frametime_s/INDICATOR_S_PER_CYCLE)*3*255);   // half length
     left_leds[upper_neighbor] = INDICATOR_COLOR;
     left_leds[upper_neighbor].fadeToBlackBy(upper_scale);
-    left_leds[lower_neighbor] = INDICATOR_COLOR;
-    left_leds[lower_neighbor].fadeToBlackBy(lower_scale);
     FastLED.show();
   }
 

@@ -30,7 +30,7 @@ namespace Pins
     // HIGH is active
     const uint8_t INDICATORS[] = {BT_LEFT_IND, BT_OFF_IND, BT_RIGHT_IND};
 
-    const uint8_t BAT_CHARGE = A6;
+    const uint8_t BAT_V = A6;
 
     void setup()
     {
