@@ -17,14 +17,7 @@ namespace Pins
     const uint8_t BT_RIGHT = 4;
     const uint8_t BUTTONS[] = {BT_LEFT, BT_OFF, BT_RIGHT};
 
-    // hardware SPI ports
-    const uint8_t DATA_LEDS_LEFT = A0;
-    const uint8_t CLOCK_LEDS_LEFT = A1;
-
-    const uint8_t DATA_LEDS_RIGHT = A2;
-    const uint8_t CLOCK_LEDS_RIGHT = A3;
-    
-    const uint8_t LED_PINS[] = {DATA_LEDS_LEFT, CLOCK_LEDS_LEFT, DATA_LEDS_RIGHT, CLOCK_LEDS_RIGHT};
+    // pad to next register to be able to use register interrupts for buttons
 
     // HIGH is on
     const uint8_t PWR_IND = 7; // blink with low bat charge
@@ -34,6 +27,19 @@ namespace Pins
     const uint8_t BT_OFF_IND = 9;
     const uint8_t BT_RIGHT_IND = 10;
     const uint8_t INDICATORS[] = {BT_LEFT_IND, BT_OFF_IND, BT_RIGHT_IND};
+
+    // SPI (11..13) is reserved for generic extensions
+
+    // hardware SPI ports
+    const uint8_t DATA_LEDS_LEFT = A0;
+    const uint8_t CLOCK_LEDS_LEFT = A1;
+
+    const uint8_t DATA_LEDS_RIGHT = A2;
+    const uint8_t CLOCK_LEDS_RIGHT = A3;
+
+    const uint8_t LED_PINS[] = {DATA_LEDS_LEFT, CLOCK_LEDS_LEFT, DATA_LEDS_RIGHT, CLOCK_LEDS_RIGHT};
+
+    // I2C (A4, A5) is reserved for gyro extensions
 
     const uint8_t BAT_V = A6;
 
