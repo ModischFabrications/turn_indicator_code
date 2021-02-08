@@ -31,13 +31,13 @@ namespace Pins
     // SPI (11..13) is reserved for generic extensions
 
     // hardware SPI ports
-    const uint8_t DATA_LEDS_LEFT = A0;
-    const uint8_t CLOCK_LEDS_LEFT = A1;
+    const uint8_t DATA_LEDS_FRONT = A0;
+    const uint8_t CLOCK_LEDS_FRONT = A1;
 
-    const uint8_t DATA_LEDS_RIGHT = A2;
-    const uint8_t CLOCK_LEDS_RIGHT = A3;
+    const uint8_t DATA_LEDS_BACK = A2;
+    const uint8_t CLOCK_LEDS_BACK = A3;
 
-    const uint8_t LED_PINS[] = {DATA_LEDS_LEFT, CLOCK_LEDS_LEFT, DATA_LEDS_RIGHT, CLOCK_LEDS_RIGHT};
+    const uint8_t LED_PINS[] = {DATA_LEDS_FRONT, CLOCK_LEDS_FRONT, DATA_LEDS_BACK, CLOCK_LEDS_BACK};
 
     // I2C (A4, A5) is reserved for gyro extensions
 
