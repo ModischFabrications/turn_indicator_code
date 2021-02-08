@@ -125,9 +125,6 @@ namespace Lights
     {
       digitalWrite(i_i, false);
     }
-
-    if (standlights)
-      draw_standlights();
   }
 
   void togglePin(uint8_t pin)
@@ -154,21 +151,16 @@ namespace Lights
     last_frame__ms = now;
 
     //fadeToBlackBy(leds, N_LEDS_PER_SIDE, (frametime_s / INDICATOR_S_PER_CYCLE) * 255); // half length
-    fadeToBlackBy(leds, N_LEDS_PER_SIDE, 20);
+    fadeToBlackBy(leds, N_LEDS_PER_SIDE, 16);
     float increment = ((frametime_s * (float)N_LEDS_PER_SIDE) / INDICATOR_S_PER_CYCLE);
-    if (rising)
-    {
-      indicator_pos += increment;
-      while (indicator_pos >= N_LEDS_PER_SIDE - 1)
-        indicator_pos -= (N_LEDS_PER_SIDE);
-    }
-    else
-    {
-      indicator_pos -= increment;
-      while (indicator_pos < 0)
-        indicator_pos += (N_LEDS_PER_SIDE);
-    }
+
+    indicator_pos += increment;
+    while (indicator_pos >= N_LEDS_PER_SIDE - 1)
+      indicator_pos -= (N_LEDS_PER_SIDE);
+
     uint8_t upper_neighbor = (uint8_t)ceil(indicator_pos);
+    if (!rising)
+      upper_neighbor = N_LEDS_PER_SIDE -1 - upper_neighbor;
     uint8_t upper_scale = (upper_neighbor - indicator_pos) * 255;
     leds[upper_neighbor] = INDICATOR_COLOR;
     leds[upper_neighbor].fadeToBlackBy(upper_scale);
@@ -179,6 +171,8 @@ namespace Lights
   {
     Serial.println(F("turning off"));
     clear();
+    if (standlights)
+      draw_standlights();
   }
 
   void turn_left()
