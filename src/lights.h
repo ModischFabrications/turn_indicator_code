@@ -27,7 +27,7 @@ namespace Lights
   const uint8_t N_LEDS_PER_STRIPE = 12; // fluid animations need a high density
   const uint8_t N_LEDS_PER_SIDE = N_LEDS_PER_STRIPE / 2;
 
-  bool standlights = false;
+  bool standlights = true;
 
   const uint8_t FRONT_LIGHT_HUE = 38;
   // make sure that your values stay inside 0..N_LEDS_PER_SIDE
@@ -50,18 +50,6 @@ namespace Lights
   // TODO: sync to blinker
   const uint16_t TURNING_TOGGLE_DELAY_MS = 500;
   uint32_t last_toggle = 0;
-
-  void setup()
-  {
-    // max 24MHz, lower is more stable (which is good as we are carelessly routing long distances in parallel)
-    FastLED.addLeds<SK9822, Pins::DATA_LEDS_FRONT, Pins::CLOCK_LEDS_FRONT, BGR, DATA_RATE_MHZ(12)>(leds_front, N_LEDS_PER_SIDE * 2).setCorrection(TypicalLEDStrip);
-    FastLED.addLeds<SK9822, Pins::DATA_LEDS_BACK, Pins::CLOCK_LEDS_BACK, BGR, DATA_RATE_MHZ(12)>(leds_back, N_LEDS_PER_SIDE * 2).setCorrection(TypicalLEDStrip);
-
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, CURRENT_LIMIT__MA);
-    FastLED.setBrightness(BRIGHTNESS);
-
-    FastLED.clear(true);
-  }
 
   void hello_world()
   {
@@ -92,6 +80,9 @@ namespace Lights
 
   void draw_standlights()
   {
+    if (!standlights)
+      return;
+
     uint8_t start_index = floor(FRONT_LIGHT_MIDDLE - FRONT_LIGHT_WIDTH / 2);
     uint8_t end_index = ceil(FRONT_LIGHT_MIDDLE + FRONT_LIGHT_WIDTH / 2);
     for (uint8_t i = start_index; i <= end_index; i++)
@@ -108,8 +99,8 @@ namespace Lights
     for (uint8_t i = start_index; i <= end_index; i++)
     {
       uint8_t brightness = 255 * brightness_in_wipe(i, TAIL_LIGHT_MIDDLE, FRONT_LIGHT_WIDTH);
-      leds_back[N_LEDS_PER_STRIPE - N_LEDS_PER_SIDE - i] = CHSV(TAIL_LIGHTS_HUE, 200, brightness);
-      leds_back[N_LEDS_PER_SIDE + i] = CHSV(TAIL_LIGHTS_HUE, 200, brightness);
+      leds_back[N_LEDS_PER_STRIPE - N_LEDS_PER_SIDE - i] = CHSV(TAIL_LIGHTS_HUE, 255, brightness);
+      leds_back[N_LEDS_PER_SIDE + i] = CHSV(TAIL_LIGHTS_HUE, 255, brightness);
     }
   }
 
@@ -160,7 +151,7 @@ namespace Lights
 
     uint8_t upper_neighbor = (uint8_t)ceil(indicator_pos);
     if (!rising)
-      upper_neighbor = N_LEDS_PER_SIDE -1 - upper_neighbor;
+      upper_neighbor = N_LEDS_PER_SIDE - 1 - upper_neighbor;
     uint8_t upper_scale = (upper_neighbor - indicator_pos) * 255;
     leds[upper_neighbor] = INDICATOR_COLOR;
     leds[upper_neighbor].fadeToBlackBy(upper_scale);
@@ -171,8 +162,7 @@ namespace Lights
   {
     Serial.println(F("turning off"));
     clear();
-    if (standlights)
-      draw_standlights();
+    draw_standlights();
   }
 
   void turn_left()
@@ -203,6 +193,19 @@ namespace Lights
 
     wipe(leds_front + N_LEDS_PER_SIDE, true);
     wipe(leds_back + N_LEDS_PER_SIDE, true);
+  }
+
+  void setup()
+  {
+    // max 24MHz, lower is more stable (which is good as we are carelessly routing long distances in parallel)
+    // AtMega328 has 16MHz internal clock, be happy to get half of that
+    FastLED.addLeds<SK9822, Pins::DATA_LEDS_FRONT, Pins::CLOCK_LEDS_FRONT, BGR, DATA_RATE_MHZ(8)>(leds_front, N_LEDS_PER_SIDE * 2).setCorrection(TypicalLEDStrip);
+    FastLED.addLeds<SK9822, Pins::DATA_LEDS_BACK, Pins::CLOCK_LEDS_BACK, BGR, DATA_RATE_MHZ(8)>(leds_back, N_LEDS_PER_SIDE * 2).setCorrection(TypicalLEDStrip);
+
+    FastLED.setMaxPowerInVoltsAndMilliamps(5, CURRENT_LIMIT__MA);
+    FastLED.setBrightness(BRIGHTNESS);
+
+    clear();
   }
 
 } // namespace Lights
