@@ -27,16 +27,14 @@ namespace Lights
   const uint8_t N_LEDS_PER_STRIPE = 12; // fluid animations need a high density
   const uint8_t N_LEDS_PER_SIDE = N_LEDS_PER_STRIPE / 2;
 
-  bool standlights = true;
-
   const uint8_t FRONT_LIGHT_HUE = 38;
   // make sure that your values stay inside 0..N_LEDS_PER_SIDE
   const float FRONT_LIGHT_MIDDLE = N_LEDS_PER_SIDE / 3.0;
   const float FRONT_LIGHT_WIDTH = N_LEDS_PER_SIDE / 4.0;
 
   const uint8_t TAIL_LIGHTS_HUE = 0;
-  const float TAIL_LIGHT_MIDDLE = N_LEDS_PER_SIDE / 3.0;
-  const float TAIL_LIGHT_WIDTH = N_LEDS_PER_SIDE / 6.0;
+  const float TAIL_LIGHT_MIDDLE = N_LEDS_PER_SIDE / 2.0;
+  const float TAIL_LIGHT_WIDTH = N_LEDS_PER_SIDE / 3.0;
 
   const CRGB INDICATOR_COLOR = CRGB::Orange;
   // shared indicator logic is okay
@@ -67,7 +65,7 @@ namespace Lights
   float brightness_in_wipe(float position, float middle, float width)
   {
     // TODO: add cubic, sin or similar
-    return 1 - (abs(position - middle) / (width / 2));
+    return max(0, 1 - (abs(position - middle) / (width / 2.0)));
   }
 
   void mirror(CRGB from[], CRGB to[])
@@ -80,14 +78,11 @@ namespace Lights
 
   void draw_standlights()
   {
-    if (!standlights)
-      return;
-
-    uint8_t start_index = floor(FRONT_LIGHT_MIDDLE - FRONT_LIGHT_WIDTH / 2);
-    uint8_t end_index = ceil(FRONT_LIGHT_MIDDLE + FRONT_LIGHT_WIDTH / 2);
+    uint8_t start_index = floor(FRONT_LIGHT_MIDDLE - (FRONT_LIGHT_WIDTH / 2));
+    uint8_t end_index = ceil(FRONT_LIGHT_MIDDLE + (FRONT_LIGHT_WIDTH / 2));
     for (uint8_t i = start_index; i <= end_index; i++)
     {
-      uint8_t brightness = 255 * brightness_in_wipe(i, FRONT_LIGHT_MIDDLE, FRONT_LIGHT_WIDTH);
+      uint8_t brightness = 255.0 * brightness_in_wipe(i, FRONT_LIGHT_MIDDLE, FRONT_LIGHT_WIDTH);
       // i=0 == i=MAX
       leds_front[N_LEDS_PER_STRIPE - N_LEDS_PER_SIDE - i] = CHSV(FRONT_LIGHT_HUE, 30, brightness);
       leds_front[N_LEDS_PER_SIDE + i] = CHSV(FRONT_LIGHT_HUE, 30, brightness);
@@ -98,7 +93,7 @@ namespace Lights
 
     for (uint8_t i = start_index; i <= end_index; i++)
     {
-      uint8_t brightness = 255 * brightness_in_wipe(i, TAIL_LIGHT_MIDDLE, FRONT_LIGHT_WIDTH);
+      uint8_t brightness = 255.0 * brightness_in_wipe(i, TAIL_LIGHT_MIDDLE, FRONT_LIGHT_WIDTH);
       leds_back[N_LEDS_PER_STRIPE - N_LEDS_PER_SIDE - i] = CHSV(TAIL_LIGHTS_HUE, 255, brightness);
       leds_back[N_LEDS_PER_SIDE + i] = CHSV(TAIL_LIGHTS_HUE, 255, brightness);
     }
@@ -112,7 +107,7 @@ namespace Lights
   void clear()
   {
     FastLED.clear(true);
-    for (uint8_t i_i : Pins::INDICATORS)
+    for (uint8_t i_i : Pins::RINGS)
     {
       digitalWrite(i_i, false);
     }
@@ -162,7 +157,6 @@ namespace Lights
   {
     Serial.println(F("turning off"));
     clear();
-    draw_standlights();
   }
 
   void turn_left()
@@ -174,7 +168,7 @@ namespace Lights
 
   void anim_left()
   {
-    togglePin(Pins::BT_LEFT_IND);
+    togglePin(Pins::BT_LEFT_RING);
 
     wipe(leds_front, false);
     wipe(leds_back, false);
@@ -189,7 +183,7 @@ namespace Lights
 
   void anim_right()
   {
-    togglePin(Pins::BT_RIGHT_IND);
+    togglePin(Pins::BT_RIGHT_RING);
 
     wipe(leds_front + N_LEDS_PER_SIDE, true);
     wipe(leds_back + N_LEDS_PER_SIDE, true);

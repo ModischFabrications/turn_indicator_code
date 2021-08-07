@@ -20,13 +20,13 @@ namespace Pins
     // pad to next register to be able to use register interrupts for buttons
 
     // HIGH is on
-    const uint8_t PWR_IND = 7; // blink with low bat charge
+    const uint8_t PWR_LED = 7; // blink with low bat charge
 
     // HIGH is on
-    const uint8_t BT_LEFT_IND = 8;
-    const uint8_t BT_OFF_IND = 9;
-    const uint8_t BT_RIGHT_IND = 10;
-    const uint8_t INDICATORS[] = {BT_LEFT_IND, BT_OFF_IND, BT_RIGHT_IND};
+    const uint8_t BT_LEFT_RING = 8;
+    const uint8_t BT_OFF_RING = 9;
+    const uint8_t BT_RIGHT_RING = 10;
+    const uint8_t RINGS[] = {BT_LEFT_RING, BT_OFF_RING, BT_RIGHT_RING};
 
     // SPI (11..13) is reserved for generic extensions
 
@@ -56,9 +56,9 @@ namespace Pins
             pinMode(i_i, OUTPUT);
         }
 
-        pinMode(PWR_IND, OUTPUT);
+        pinMode(PWR_LED, OUTPUT);
 
-        for (uint8_t i_i : INDICATORS)
+        for (uint8_t i_i : RINGS)
         {
             pinMode(i_i, OUTPUT);
         }
@@ -74,31 +74,31 @@ namespace Pins
             digitalWrite(i_i, false);
         }
 
-        digitalWrite(PWR_IND, false);
+        digitalWrite(PWR_LED, false);
 
-        for (uint8_t i_i : INDICATORS)
+        for (uint8_t i_i : RINGS)
         {
             digitalWrite(i_i, false);
         }
     }
 
-    void test_indicators()
+    void test_output()
     {
-        digitalWrite(PWR_IND, false);
+        digitalWrite(PWR_LED, false);
 
-        digitalWrite(BT_LEFT_IND, false);
-        digitalWrite(BT_OFF_IND, true);
-        digitalWrite(BT_RIGHT_IND, false);
+        digitalWrite(BT_LEFT_RING, false);
+        digitalWrite(BT_OFF_RING, true);
+        digitalWrite(BT_RIGHT_RING, false);
         delay(200);
-        digitalWrite(BT_LEFT_IND, true);
-        digitalWrite(BT_OFF_IND, false);
-        digitalWrite(BT_RIGHT_IND, true);
+        digitalWrite(BT_LEFT_RING, true);
+        digitalWrite(BT_OFF_RING, false);
+        digitalWrite(BT_RIGHT_RING, true);
         delay(200);
-        digitalWrite(BT_LEFT_IND, false);
-        digitalWrite(BT_OFF_IND, false);
-        digitalWrite(BT_RIGHT_IND, false);
+        digitalWrite(BT_LEFT_RING, false);
+        digitalWrite(BT_OFF_RING, false);
+        digitalWrite(BT_RIGHT_RING, false);
 
-        digitalWrite(PWR_IND, true);
+        digitalWrite(PWR_LED, true);
     }
 
 } // namespace Pins

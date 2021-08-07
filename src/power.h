@@ -18,7 +18,7 @@ namespace Power
     {
         Serial.print(F("Initial power reading is "));
         Serial.println(analogRead(Pins::BAT_V));
-        digitalWrite(Pins::PWR_IND, true);
+        digitalWrite(Pins::PWR_LED, true);
     }
 
     void blink()
@@ -27,7 +27,7 @@ namespace Power
         if (now - last_toggle > PWR_TOGGLE_DELAY_MS)
         {
             last_toggle = now;
-            digitalWrite(Pins::PWR_IND, !digitalRead(Pins::PWR_IND));
+            digitalWrite(Pins::PWR_LED, !digitalRead(Pins::PWR_LED));
         }
     }
 
@@ -51,7 +51,7 @@ namespace Power
             Serial.print("Power restored with a measurement of ");
             Serial.println(bat_voltage);
             power_low = false;
-            digitalWrite(Pins::PWR_IND, true);
+            digitalWrite(Pins::PWR_LED, true);
         }
 
         if (power_low)
