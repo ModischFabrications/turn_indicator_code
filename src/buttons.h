@@ -21,14 +21,15 @@ namespace Buttons
         int id = (int)i;
         Serial.print("Triggering ");
         Serial.println(id);
-        States::fsm.trigger(id);
+        States::switchFor(id);
     }
 
     void tick()
     {
-        for (OneButton o_b : O_BUTTONS)
+        // sadly O_BUTTONS is not compile-time, so range is wrong
+        for (int i=0; i<3; i++)
         {
-            o_b.tick();
+            O_BUTTONS[i].tick();
         }
     }
 
@@ -36,10 +37,11 @@ namespace Buttons
     {
         for (int i=0; i<3; i++)
         {
-            OneButton o_b = OneButton(Pins::BUTTONS[i]);
-           o_b.attachClick(trigger,(void*)  i);
-           o_b.attachLongPressStart(trigger, (void*) (i*10));
-           O_BUTTONS[i] = o_b;
+            int pin = Pins::BUTTONS[i];
+            OneButton o_b = OneButton(pin);
+            o_b.attachClick(trigger,(void*) pin);
+            o_b.attachLongPressStart(trigger, (void*) (pin*10));
+            O_BUTTONS[i] = o_b;
         }
 
         OBT_LEFT = O_BUTTONS[0];

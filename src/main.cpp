@@ -26,7 +26,7 @@ void setup()
 
   Lights::hello_world();
 
-  States::register_transitions();
+  Serial.println(F("Ready for action!"));
 }
 
 void loop()
@@ -34,7 +34,7 @@ void loop()
   Buttons::tick();
   Power::check_power();
 
-  States::fsm.run_machine(); // timed transitions and on_state calls
+  States::tick();
 
   // keep constant loop duration by aligning to target duration
   Lights::sleep(TARGET_LOOP_DURATION__MS - (millis() % TARGET_LOOP_DURATION__MS));

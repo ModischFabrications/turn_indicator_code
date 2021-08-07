@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <Fsm.h>
 
 #include "lights.h"
 #include "pins.h"
@@ -10,42 +9,95 @@ namespace States
 {
     const uint16_t TIMED_STATE_DURATION_MS = 5 * 1000;
 
-    // pin numbers are unique by design
-    // *10 for long press
-    const uint8_t EV_OFF = Pins::BT_OFF;
-    const uint8_t EV_LEFT = Pins::BT_LEFT;
-    const uint8_t EV_RIGHT = Pins::BT_RIGHT;
+    enum cState {
+        ERROR = 0,
+        OFF,
+        STANDING,
+        TIMED_LEFT,
+        LEFT,
+        TIMED_RIGHT,
+        RIGHT,
+    };
 
-    // https://github.com/jonblack/arduino-fsm/blob/master/examples/timed_switchoff/timed_switchoff.ino
-    State off_state(Lights::turn_off, NULL, NULL);
-    State stand_state(Lights::draw_standlights, NULL, NULL);
+    cState active = cState::OFF;
+    uint32_t off_at = -1;
 
-    State timed_left_state(Lights::turn_left, Lights::anim_left, NULL);         // identical behaviour, split just for FSM identification
-    State left_state(Lights::turn_left, Lights::anim_left, NULL);
-    State timed_right_state(Lights::turn_right, Lights::anim_right, NULL);
-    State right_state(Lights::turn_right, Lights::anim_right, NULL);
-
-    Fsm fsm(&off_state);
-
-    void register_transitions()
+    void scheduleOff()
     {
-        //fsm.add_transition(&left_state, &off_state, EV_OFF, NULL);
-        fsm.add_timed_transition(&timed_left_state, &off_state, TIMED_STATE_DURATION_MS, NULL);
-        fsm.add_timed_transition(&timed_right_state, &off_state, TIMED_STATE_DURATION_MS, NULL);
-        
-        fsm.add_transition(&left_state, &off_state, EV_OFF, NULL);
-        fsm.add_transition(&right_state, &off_state, EV_OFF, NULL);
-        fsm.add_transition(&left_state, &stand_state, EV_OFF*10, NULL);
-        fsm.add_transition(&right_state, &stand_state, EV_OFF*10, NULL);
-
-        fsm.add_transition(&off_state, &timed_left_state, EV_LEFT, NULL);
-        fsm.add_transition(&right_state, &timed_left_state, EV_LEFT, NULL);
-        fsm.add_transition(&off_state, &left_state, EV_LEFT*10, NULL);
-        fsm.add_transition(&right_state, &left_state, EV_LEFT*10, NULL);
-
-        fsm.add_transition(&off_state, &timed_right_state, EV_RIGHT, NULL);
-        fsm.add_transition(&left_state, &timed_right_state, EV_RIGHT, NULL);
-        fsm.add_transition(&off_state, &right_state, EV_RIGHT*10, NULL);
-        fsm.add_transition(&left_state, &right_state, EV_RIGHT*10, NULL);
+        Serial.println(millis());
+        off_at = millis() + TIMED_STATE_DURATION_MS;
+        Serial.println(off_at);
     }
+
+    cState convert(uint8_t pin)
+    {
+        if (pin == Pins::BT_OFF) return cState::OFF;
+        if (pin == Pins::BT_OFF*10) return cState::STANDING;
+        if (pin == Pins::BT_LEFT) return cState::TIMED_LEFT;
+        if (pin == Pins::BT_LEFT*10) return cState::LEFT;
+        if (pin == Pins::BT_RIGHT) return cState::TIMED_RIGHT;
+        if (pin == Pins::BT_RIGHT*10) return cState::RIGHT;
+        return cState::ERROR;
+    }
+
+    void switchTo(cState state)
+    {
+        switch (state)
+        {
+        case cState::OFF:
+            Lights::turn_off();
+            break;
+        case cState::STANDING:
+            Lights::draw_standlights();
+            break;
+        case cState::TIMED_LEFT:
+            scheduleOff();
+        case cState::LEFT:
+            Lights::turn_left();
+            break;
+        case cState::TIMED_RIGHT:
+            scheduleOff();
+        case cState::RIGHT:
+            Lights::turn_right();
+            break;
+        default:
+            break;
+        }
+        active = state;
+        Serial.print("Now in state ");
+        Serial.println(active);
+    }
+
+    void switchFor(uint8_t pin)
+    {
+        Serial.print("Switch for ");
+        Serial.println(pin);
+        switchTo(convert(pin));
+    }
+
+    void tick()
+    {
+        if ((active == cState::TIMED_LEFT || active == cState::TIMED_RIGHT) && (millis() > off_at))
+        {
+            Serial.println("Timeout, back to off");
+            Serial.println(millis());
+            off_at = -1;
+            switchTo(cState::OFF);
+            return;
+        }
+
+        switch (active)
+        {
+        case cState::LEFT:
+            Lights::anim_left();
+            break;
+        case cState::RIGHT:
+            Lights::anim_right();
+            break;
+        default:
+            break;
+        }
+    }
+
+
 } // namespace States
