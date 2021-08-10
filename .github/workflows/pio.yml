@@ -2,12 +2,10 @@ name: PlatformIO CI
 
 on:
   push:
-    tags-ignore:
-      - '**'
+  workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
