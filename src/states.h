@@ -88,9 +88,11 @@ namespace States
 
         switch (active)
         {
+        case cState::TIMED_LEFT:
         case cState::LEFT:
             Lights::anim_left();
             break;
+        case cState::TIMED_RIGHT:
         case cState::RIGHT:
             Lights::anim_right();
             break;
