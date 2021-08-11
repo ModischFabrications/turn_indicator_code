@@ -15,6 +15,7 @@
  * https://www.reddit.com/r/FastLED/wiki/index/user_examples
  * https://learn.adafruit.com/dotstar-belly-dance-fans/the-code
  *
+ * This class should honor different timescales, but call into it periodically for proper animations
  * */
 
 namespace Lights {
