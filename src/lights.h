@@ -38,6 +38,8 @@ const uint8_t TAIL_LIGHTS_HUE = 0;
 const float TAIL_LIGHT_MIDDLE = N_LEDS_PER_SIDE / 2.0;
 const float TAIL_LIGHT_WIDTH = N_LEDS_PER_SIDE / 3.0;
 
+const float SMOOTHING = 1.5;
+
 const CRGB INDICATOR_COLOR = CRGB::Orange;
 // shared indicator logic is okay
 const float INDICATOR_S_PER_CYCLE = 1;
@@ -83,29 +85,43 @@ void reset_indicators() {
     last_toggle = millis();
 }
 
-void wipe(CRGB leds[], bool rising) {
+void update_indicator_pos() {
     uint32_t now = millis();
     float frametime_s = (now - last_frame__ms * 1.0) / 1000;
     last_frame__ms = now;
 
-    // fadeToBlackBy(leds, N_LEDS_PER_SIDE, (frametime_s / INDICATOR_S_PER_CYCLE) * 255); // half
-    // length
-    fadeToBlackBy(leds, N_LEDS_PER_SIDE, 16);
     float increment = ((frametime_s * (float)N_LEDS_PER_SIDE) / INDICATOR_S_PER_CYCLE);
 
     indicator_pos += increment;
-    while (indicator_pos >= N_LEDS_PER_SIDE - 1)
-        indicator_pos -= (N_LEDS_PER_SIDE);
 
+    // wrap around
+    while (indicator_pos >= N_LEDS_PER_SIDE - 1)
+        indicator_pos -= N_LEDS_PER_SIDE;
+
+    fadeToBlackBy(leds_front, N_LEDS_PER_STRIPE, frametime_s * SMOOTHING * 255.0);
+    fadeToBlackBy(leds_back, N_LEDS_PER_STRIPE, frametime_s * SMOOTHING * 255.0);
+}
+
+void wipe_smooth(CRGB leds[], bool rising) {
+    uint8_t upper_neighbor = (uint8_t)ceil(indicator_pos);
+    uint8_t lower_neighbor = upper_neighbor - 1;
+    if (lower_neighbor > N_LEDS_PER_SIDE)
+        lower_neighbor += N_LEDS_PER_SIDE;
+
+    if (!rising) {
+        upper_neighbor = N_LEDS_PER_SIDE - 1 - upper_neighbor;
+        lower_neighbor = N_LEDS_PER_SIDE - 1 - lower_neighbor;
+    }
+    leds[lower_neighbor] = INDICATOR_COLOR;
+    leds[upper_neighbor] = INDICATOR_COLOR;
+    leds[upper_neighbor] %= 255.0 * (indicator_pos - floor(indicator_pos));
+}
+
+void wipe(CRGB leds[], bool rising) {
     uint8_t upper_neighbor = (uint8_t)ceil(indicator_pos);
     if (!rising)
         upper_neighbor = N_LEDS_PER_SIDE - 1 - upper_neighbor;
-    uint8_t upper_scale = (upper_neighbor - indicator_pos) * 255;
     leds[upper_neighbor] = INDICATOR_COLOR;
-    leds[upper_neighbor].fadeToBlackBy(upper_scale);
-    FastLED.show();
-
-    // TODO mirror to other half?
 }
 
 } // namespace
