@@ -56,9 +56,9 @@ float brightness_in_wipe(float position, float middle, float width) {
     return max(0, 1 - (abs(position - middle) / (width / 2.0)));
 }
 
-void mirror(CRGB from[], CRGB to[]) {
-    for (uint8_t i = 0; i < N_LEDS_PER_SIDE; i++) {
-        to[N_LEDS_PER_SIDE - i] = from[i];
+void mirror(CRGB leds[]) {
+    for (uint8_t i = 0; i < N_LEDS_PER_STRIPE; i++) {
+        leds[N_LEDS_PER_STRIPE - i - 1] = leds[i];
     }
 }
 
@@ -116,6 +116,8 @@ void turn_off() {
 }
 
 void draw_standlights() {
+    clear();
+
     uint8_t start_index = floor(FRONT_LIGHT_MIDDLE - (FRONT_LIGHT_WIDTH / 2));
     uint8_t end_index = ceil(FRONT_LIGHT_MIDDLE + (FRONT_LIGHT_WIDTH / 2));
     for (uint8_t i = start_index; i <= end_index; i++) {
@@ -183,11 +185,14 @@ void hello_world() {
     for (uint8_t i = 0; i < N_LEDS_PER_SIDE; i++) {
         leds_front[i] = CRGB::White;
         leds_back[i] = CRGB::White;
+        mirror(leds_front);
+        mirror(leds_back);
         FastLED.show();
         FastLED.delay(100);
         leds_front[i] = CRGB::Black;
         leds_back[i] = CRGB::Black;
     }
+    clear();
 }
 
 void sleep(uint32_t time_ms) { FastLED.delay(time_ms); }
