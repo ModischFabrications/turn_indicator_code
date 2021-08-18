@@ -1,6 +1,6 @@
 # turn_indicator_code
 
-WIP!
+This is the Arduino code for [Turn Indicator](https://github.com/ModischFabrications/Turn_Indicator).
 
 ## Code
 "A Class with one instance is like a group with one person. " -> Use a namespace instead
