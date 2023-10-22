@@ -1,8 +1,12 @@
 #include <Arduino.h>
+#include <time.h>
 
+#define DEBUG
+
+#include "shared/serialWrapper.h"
+#include "pins.h"
 #include "buttons.h"
 #include "lights.h"
-#include "pins.h"
 #include "power.h"
 #include "sleep.h"
 #include "states.h"
@@ -15,18 +19,23 @@ void setup() {
     Pins::setup();
     Pins::clear_output();
 
-    Serial.begin(115200);
-    Serial.println(F("Starting..."));
+    setupSerial(115200);
+    println(F("Initializing..."));
+
+    const time_t unixBuildTime = LAST_BUILD_TIME;
+    print(F("Build date: "));
+    printlnRaw(ctime(&unixBuildTime));  // this formatting is not great, but easy
 
     Buttons::setup();
     Lights::setup();
     Power::setup();
 
+    println(F(".. Done!\nStarting IO tests..."));
     Pins::test_output();
 
     Lights::hello_world();
 
-    Serial.println(F("Ready for action!"));
+    println(F(".. Done!\n Ready for action!\n"));
 }
 
 void measure_looptime() {
@@ -39,17 +48,18 @@ void measure_looptime() {
 
     if (delta_t > 5000) {
         last_print = now;
-        Serial.print(F("Time-Delta "));
-        Serial.print(delta_t);
-        Serial.print(F(" ms, Loop Calls "));
-        Serial.print(call_counter);
-        Serial.print(F(" -> Average Looptime (ms): "));
-        Serial.println((float)delta_t / call_counter);
+        print(F("Time-Delta "));
+        printRaw(delta_t);
+        print(F(" ms, Loop Calls "));
+        printRaw(call_counter);
+        print(F(" -> Average Looptime (ms): "));
+        printlnRaw((float)delta_t / call_counter);
         call_counter = 0;
     }
 }
 
 void loop() {
+    heartbeatSerial();
     Buttons::tick();
     Power::check_power();
 

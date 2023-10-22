@@ -5,8 +5,6 @@
 /**
  * https://components101.com/sites/default/files/component_pin/Arduino-Nano-Pinout.png
  *
- *
- *
  * */
 
 namespace Pins {

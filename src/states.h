@@ -4,6 +4,7 @@
 
 #include "lights.h"
 #include "pins.h"
+#include "shared/serialWrapper.h"
 
 /*
 This was using FSM before, but I needed buttons to always trigger the same state, regardless of
@@ -29,9 +30,9 @@ cState active = cState::OFF;
 uint32_t off_at = -1;
 
 void enableCountdown() {
-    Serial.println(millis());
+    printlnRaw(millis());
     off_at = millis() + TIMED_STATE_DURATION_MS;
-    Serial.println(off_at);
+    printlnRaw(off_at);
 }
 
 cState convert(uint8_t pin) {
@@ -72,22 +73,22 @@ void switchTo(cState state) {
         break;
     }
     active = state;
-    Serial.print(F("Now in state "));
-    Serial.println(active);
+    print(F("Now in state "));
+    printlnRaw(active);
 }
 
 } // namespace
 
 void switchFor(uint8_t pin) {
-    Serial.print(F("Switch for "));
-    Serial.println(pin);
+    print(F("Switch for "));
+    printlnRaw(pin);
     switchTo(convert(pin));
 }
 
 void tick() {
     if ((active == cState::TIMED_LEFT || active == cState::TIMED_RIGHT) && (millis() > off_at)) {
-        Serial.println(F("Timeout, back to off"));
-        Serial.println(millis());
+        println(F("Timeout, back to off"));
+        printlnRaw(millis());
         off_at = -1;
         switchTo(cState::OFF);
         return;

@@ -5,6 +5,7 @@
 #include <FastLED.h>
 
 #include "pins.h"
+#include "shared/serialWrapper.h"
 
 /**
  * simulate using https://wokwi.com/arduino/libraries/FastLED
@@ -26,7 +27,7 @@ const uint32_t CURRENT_LIMIT__MA = 500;
 // physical strip has *2 because both sides are chained through
 // going from last left to last right
 // needs to be even!
-const uint8_t N_LEDS_PER_STRIPE = 12; // fluid animations need a high density
+const uint8_t N_LEDS_PER_STRIPE = 40; // fluid animations need a high density
 const uint8_t N_LEDS_PER_SIDE = N_LEDS_PER_STRIPE / 2;
 
 const uint8_t FRONT_LIGHT_HUE = 38;
@@ -42,7 +43,7 @@ const float SMOOTHING = 1.5;
 
 const CRGB INDICATOR_COLOR = CRGB::Orange;
 // shared indicator logic is okay
-const float INDICATOR_S_PER_CYCLE = 1;
+const float INDICATOR_S_PER_CYCLE = 1.5;
 float indicator_pos = 0;
 uint32_t last_frame__ms = millis();
 
@@ -127,7 +128,7 @@ void wipe(CRGB leds[], bool rising) {
 } // namespace
 
 void turn_off() {
-    Serial.println(F("turning off"));
+    println(F("turning off"));
     clear();
 }
 
@@ -154,7 +155,7 @@ void draw_standlights() {
 }
 
 void turn_left() {
-    Serial.println(F("turning left"));
+    println(F("turning left"));
     clear();
     reset_indicators();
 }
@@ -167,7 +168,7 @@ void anim_left() {
 }
 
 void turn_right() {
-    Serial.println(F("turning right"));
+    println(F("turning right"));
     clear();
     reset_indicators();
 }

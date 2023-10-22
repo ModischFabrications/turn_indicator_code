@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include "pins.h"
+#include "shared/serialWrapper.h"
 
 namespace Power {
 namespace {
@@ -27,21 +28,22 @@ float toVolt(uint16_t reading) { return (5.0 / 1024) * reading; }
 } // namespace
 
 void setup() {
-    Serial.print(F("Initial power reading is "));
-    Serial.println(analogRead(Pins::BAT_V));
+    print(F("Initial power reading is "));
+    printRaw(toVolt(analogRead(Pins::BAT_V)));
+    println(F("V"));
     digitalWrite(Pins::PWR_LED, true);
 }
 
 void check_power() {
     float bat_voltage = toVolt(analogRead(Pins::BAT_V));
-    // Serial.println(bat_voltage);
+    // println(bat_voltage);
     if (!power_low && bat_voltage < BAT_EMPTY) {
-        Serial.print(F("Power low with a measurement of "));
-        Serial.println(bat_voltage);
+        print(F("Power low with a measurement of "));
+        printlnRaw(bat_voltage);
         power_low = true;
     } else if (power_low && bat_voltage > BAT_FULL) {
-        Serial.print(F("Power restored with a measurement of "));
-        Serial.println(bat_voltage);
+        print(F("Power restored with a measurement of "));
+        printlnRaw(bat_voltage);
         power_low = false;
         digitalWrite(Pins::PWR_LED, true);
     }
